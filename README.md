@@ -1,1 +1,1 @@
-# HARP 312
+# HARP 312 - Hybrid Audio Restoration Pipeline
