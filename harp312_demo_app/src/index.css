@@ -1,0 +1,229 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 14% 96%;
+    --foreground: 220 20% 15%;
+
+    --card: 220 14% 98%;
+    --card-foreground: 220 20% 15%;
+    --card-elevated: 0 0% 100%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 262 83% 68%;
+
+    --secondary: 220 14% 92%;
+    --secondary-foreground: 220 20% 25%;
+
+    --muted: 220 14% 90%;
+    --muted-foreground: 220 10% 50%;
+
+    --accent: 330 80% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 14% 88%;
+    --input: 220 14% 94%;
+    --ring: 262 83% 58%;
+
+    --radius: 0.75rem;
+
+    /* Neumorphic shadows */
+    --shadow-neumorphic: 
+      4px 4px 8px hsl(220 14% 88% / 0.7),
+      -4px -4px 8px hsl(0 0% 100% / 0.8);
+    --shadow-neumorphic-inset: 
+      inset 3px 3px 6px hsl(220 14% 88% / 0.5),
+      inset -3px -3px 6px hsl(0 0% 100% / 0.7);
+    --shadow-neumorphic-sm: 
+      2px 2px 4px hsl(220 14% 88% / 0.6),
+      -2px -2px 4px hsl(0 0% 100% / 0.7);
+    
+    /* Accent gradient */
+    --gradient-accent: linear-gradient(135deg, hsl(262 83% 58%), hsl(330 80% 60%));
+    --gradient-accent-soft: linear-gradient(135deg, hsl(262 83% 58% / 0.1), hsl(330 80% 60% / 0.1));
+    
+    /* Chart panel */
+    --chart-bg: 220 20% 12%;
+    --chart-foreground: 220 10% 85%;
+    --chart-grid: 220 15% 25%;
+
+    /* Pipeline */
+    --pipeline-active: 262 83% 58%;
+    --pipeline-complete: 160 60% 45%;
+    --pipeline-pending: 220 14% 75%;
+
+    /* Waveform */
+    --waveform-bg: 220 20% 8%;
+    --waveform-bar: 262 83% 58%;
+    --waveform-bar-alt: 330 80% 60%;
+  }
+
+  .dark {
+    --background: 220 20% 10%;
+    --foreground: 220 10% 95%;
+    --card: 220 20% 14%;
+    --card-foreground: 220 10% 95%;
+    --card-elevated: 220 20% 18%;
+    --border: 220 15% 22%;
+    --input: 220 15% 18%;
+    --muted: 220 15% 20%;
+    --muted-foreground: 220 10% 60%;
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 220 10% 85%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html, body, #root {
+    @apply h-full;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: 
+      radial-gradient(ellipse at top left, hsl(262 30% 95%) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, hsl(330 30% 95%) 0%, transparent 50%),
+      linear-gradient(135deg, hsl(220 14% 96%) 0%, hsl(220 14% 93%) 100%);
+  }
+
+  .font-mono {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+}
+
+@layer components {
+  /* Scrollbar hide utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Neumorphic card styles */
+  .neumorphic {
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-neumorphic);
+  }
+
+  .neumorphic-inset {
+    background: hsl(var(--background));
+    border-radius: calc(var(--radius) - 4px);
+    box-shadow: var(--shadow-neumorphic-inset);
+  }
+
+  .neumorphic-sm {
+    background: hsl(var(--card));
+    border-radius: calc(var(--radius) - 4px);
+    box-shadow: var(--shadow-neumorphic-sm);
+  }
+
+  /* Gradient accent button */
+  .btn-accent {
+    background: var(--gradient-accent);
+    color: hsl(var(--primary-foreground));
+    border-radius: calc(var(--radius) - 4px);
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px hsl(262 83% 58% / 0.3);
+  }
+
+  .btn-accent:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px hsl(262 83% 58% / 0.4);
+  }
+
+  /* Chart dark panel */
+  .chart-panel {
+    background: hsl(var(--chart-bg));
+    border-radius: calc(var(--radius) - 4px);
+    color: hsl(var(--chart-foreground));
+  }
+
+  /* Waveform container */
+  .waveform-container {
+    background: hsl(var(--waveform-bg));
+    border-radius: calc(var(--radius) - 4px);
+    overflow: hidden;
+  }
+
+  /* Badge styles */
+  .badge-info {
+    @apply px-2 py-0.5 rounded-md text-xs font-mono font-medium;
+    background: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+  }
+
+  .badge-accent {
+    @apply px-2 py-0.5 rounded-md text-xs font-mono font-medium;
+    background: var(--gradient-accent-soft);
+    color: hsl(var(--primary));
+  }
+
+  /* Segmented control */
+  .segmented-control {
+    @apply flex p-1 rounded-lg;
+    background: hsl(var(--muted));
+  }
+
+  .segmented-btn {
+    @apply px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .segmented-btn.active {
+    background: hsl(var(--card));
+    color: hsl(var(--foreground));
+    box-shadow: var(--shadow-neumorphic-sm);
+  }
+
+  /* Timeline slider */
+  .timeline-slider {
+    @apply w-full h-1.5 rounded-full appearance-none cursor-pointer;
+    background: hsl(var(--muted));
+  }
+
+  .timeline-slider::-webkit-slider-thumb {
+    @apply w-3 h-3 rounded-full appearance-none cursor-pointer;
+    background: var(--gradient-accent);
+    box-shadow: 0 2px 6px hsl(262 83% 58% / 0.4);
+  }
+
+  .timeline-slider::-moz-range-thumb {
+    @apply w-3 h-3 rounded-full border-0 cursor-pointer;
+    background: var(--gradient-accent);
+    box-shadow: 0 2px 6px hsl(262 83% 58% / 0.4);
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 20px hsl(262 83% 58% / 0.3);
+  }
+}

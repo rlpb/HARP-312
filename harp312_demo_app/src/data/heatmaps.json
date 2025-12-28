@@ -1,0 +1,432 @@
+{
+  "schema_version": "1.0",
+  "units": {
+    "index_range": "0-100"
+  },
+  "columns": [
+    {
+      "key": "hi_freq_ext",
+      "label": "Hi-Freq Ext (16–24k / 20–16k)"
+    },
+    {
+      "key": "stereo_ms_width",
+      "label": "Stereo (M/S width)"
+    },
+    {
+      "key": "hf_contrast",
+      "label": "HF Contrast (Air vs residue)"
+    },
+    {
+      "key": "loudness_lufs",
+      "label": "Loudness (Integrated LUFS)"
+    },
+    {
+      "key": "overall",
+      "label": "Overall"
+    }
+  ],
+  "rows": [
+    {
+      "key": "musicgen_idea",
+      "label": "MusicGen (Idea)"
+    },
+    {
+      "key": "apollo_clean",
+      "label": "Apollo (Clean)"
+    },
+    {
+      "key": "audiosr_hifi",
+      "label": "AudioSR (Hi-Fi)"
+    },
+    {
+      "key": "master_final",
+      "label": "Master (Final)"
+    }
+  ],
+  "heatmaps": [
+    {
+      "id": 1,
+      "source_image": "Heatmap 1.png",
+      "matrix_row_major": [
+        [
+          15,
+          2,
+          31,
+          63,
+          16
+        ],
+        [
+          20,
+          2,
+          46,
+          60,
+          23
+        ],
+        [
+          68,
+          2,
+          74,
+          57,
+          48
+        ],
+        [
+          68,
+          79,
+          74,
+          62,
+          74
+        ]
+      ],
+      "by_row": {
+        "musicgen_idea": {
+          "hi_freq_ext": 15,
+          "stereo_ms_width": 2,
+          "hf_contrast": 31,
+          "loudness_lufs": 63,
+          "overall": 16
+        },
+        "apollo_clean": {
+          "hi_freq_ext": 20,
+          "stereo_ms_width": 2,
+          "hf_contrast": 46,
+          "loudness_lufs": 60,
+          "overall": 23
+        },
+        "audiosr_hifi": {
+          "hi_freq_ext": 68,
+          "stereo_ms_width": 2,
+          "hf_contrast": 74,
+          "loudness_lufs": 57,
+          "overall": 48
+        },
+        "master_final": {
+          "hi_freq_ext": 68,
+          "stereo_ms_width": 79,
+          "hf_contrast": 74,
+          "loudness_lufs": 62,
+          "overall": 74
+        }
+      }
+    },
+    {
+      "id": 2,
+      "source_image": "Heatmap 2.png",
+      "matrix_row_major": [
+        [
+          17,
+          3,
+          10,
+          62,
+          10
+        ],
+        [
+          29,
+          5,
+          30,
+          45,
+          21
+        ],
+        [
+          91,
+          4,
+          88,
+          55,
+          61
+        ],
+        [
+          91,
+          79,
+          88,
+          62,
+          86
+        ]
+      ],
+      "by_row": {
+        "musicgen_idea": {
+          "hi_freq_ext": 17,
+          "stereo_ms_width": 3,
+          "hf_contrast": 10,
+          "loudness_lufs": 62,
+          "overall": 10
+        },
+        "apollo_clean": {
+          "hi_freq_ext": 29,
+          "stereo_ms_width": 5,
+          "hf_contrast": 30,
+          "loudness_lufs": 45,
+          "overall": 21
+        },
+        "audiosr_hifi": {
+          "hi_freq_ext": 91,
+          "stereo_ms_width": 4,
+          "hf_contrast": 88,
+          "loudness_lufs": 55,
+          "overall": 61
+        },
+        "master_final": {
+          "hi_freq_ext": 91,
+          "stereo_ms_width": 79,
+          "hf_contrast": 88,
+          "loudness_lufs": 62,
+          "overall": 86
+        }
+      }
+    },
+    {
+      "id": 3,
+      "source_image": "Heatmap 3.png",
+      "matrix_row_major": [
+        [
+          21,
+          2,
+          13,
+          62,
+          12
+        ],
+        [
+          40,
+          4,
+          41,
+          48,
+          28
+        ],
+        [
+          92,
+          3,
+          92,
+          59,
+          62
+        ],
+        [
+          92,
+          79,
+          92,
+          63,
+          87
+        ]
+      ],
+      "by_row": {
+        "musicgen_idea": {
+          "hi_freq_ext": 21,
+          "stereo_ms_width": 2,
+          "hf_contrast": 13,
+          "loudness_lufs": 62,
+          "overall": 12
+        },
+        "apollo_clean": {
+          "hi_freq_ext": 40,
+          "stereo_ms_width": 4,
+          "hf_contrast": 41,
+          "loudness_lufs": 48,
+          "overall": 28
+        },
+        "audiosr_hifi": {
+          "hi_freq_ext": 92,
+          "stereo_ms_width": 3,
+          "hf_contrast": 92,
+          "loudness_lufs": 59,
+          "overall": 62
+        },
+        "master_final": {
+          "hi_freq_ext": 92,
+          "stereo_ms_width": 79,
+          "hf_contrast": 92,
+          "loudness_lufs": 63,
+          "overall": 87
+        }
+      }
+    },
+    {
+      "id": 4,
+      "source_image": "Heatmap 4.png",
+      "matrix_row_major": [
+        [
+          30,
+          2,
+          0,
+          62,
+          11
+        ],
+        [
+          50,
+          2,
+          25,
+          59,
+          26
+        ],
+        [
+          82,
+          0,
+          69,
+          73,
+          51
+        ],
+        [
+          82,
+          80,
+          69,
+          62,
+          77
+        ]
+      ],
+      "by_row": {
+        "musicgen_idea": {
+          "hi_freq_ext": 30,
+          "stereo_ms_width": 2,
+          "hf_contrast": 0,
+          "loudness_lufs": 62,
+          "overall": 11
+        },
+        "apollo_clean": {
+          "hi_freq_ext": 50,
+          "stereo_ms_width": 2,
+          "hf_contrast": 25,
+          "loudness_lufs": 59,
+          "overall": 26
+        },
+        "audiosr_hifi": {
+          "hi_freq_ext": 82,
+          "stereo_ms_width": 0,
+          "hf_contrast": 69,
+          "loudness_lufs": 73,
+          "overall": 51
+        },
+        "master_final": {
+          "hi_freq_ext": 82,
+          "stereo_ms_width": 80,
+          "hf_contrast": 69,
+          "loudness_lufs": 62,
+          "overall": 77
+        }
+      }
+    },
+    {
+      "id": 5,
+      "source_image": "Heatmap 5.png",
+      "matrix_row_major": [
+        [
+          15,
+          2,
+          41,
+          61,
+          19
+        ],
+        [
+          24,
+          5,
+          63,
+          40,
+          31
+        ],
+        [
+          68,
+          4,
+          100,
+          48,
+          57
+        ],
+        [
+          68,
+          79,
+          100,
+          63,
+          82
+        ]
+      ],
+      "by_row": {
+        "musicgen_idea": {
+          "hi_freq_ext": 15,
+          "stereo_ms_width": 2,
+          "hf_contrast": 41,
+          "loudness_lufs": 61,
+          "overall": 19
+        },
+        "apollo_clean": {
+          "hi_freq_ext": 24,
+          "stereo_ms_width": 5,
+          "hf_contrast": 63,
+          "loudness_lufs": 40,
+          "overall": 31
+        },
+        "audiosr_hifi": {
+          "hi_freq_ext": 68,
+          "stereo_ms_width": 4,
+          "hf_contrast": 100,
+          "loudness_lufs": 48,
+          "overall": 57
+        },
+        "master_final": {
+          "hi_freq_ext": 68,
+          "stereo_ms_width": 79,
+          "hf_contrast": 100,
+          "loudness_lufs": 63,
+          "overall": 82
+        }
+      }
+    },
+    {
+      "id": 6,
+      "source_image": "Heatmap 6.png",
+      "matrix_row_major": [
+        [
+          29,
+          2,
+          0,
+          63,
+          10
+        ],
+        [
+          42,
+          3,
+          14,
+          57,
+          19
+        ],
+        [
+          85,
+          0,
+          75,
+          73,
+          53
+        ],
+        [
+          85,
+          80,
+          75,
+          62,
+          80
+        ]
+      ],
+      "by_row": {
+        "musicgen_idea": {
+          "hi_freq_ext": 29,
+          "stereo_ms_width": 2,
+          "hf_contrast": 0,
+          "loudness_lufs": 63,
+          "overall": 10
+        },
+        "apollo_clean": {
+          "hi_freq_ext": 42,
+          "stereo_ms_width": 3,
+          "hf_contrast": 14,
+          "loudness_lufs": 57,
+          "overall": 19
+        },
+        "audiosr_hifi": {
+          "hi_freq_ext": 85,
+          "stereo_ms_width": 0,
+          "hf_contrast": 75,
+          "loudness_lufs": 73,
+          "overall": 53
+        },
+        "master_final": {
+          "hi_freq_ext": 85,
+          "stereo_ms_width": 80,
+          "hf_contrast": 75,
+          "loudness_lufs": 62,
+          "overall": 80
+        }
+      }
+    }
+  ]
+}
