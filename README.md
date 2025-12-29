@@ -1,1 +1,270 @@
-# HARP 312 - Hybrid Audio Restoration Process
+<!-- =======================================================
+HARP 312 — README
+Repo: https://github.com/rlpb/HARP-312
+======================================================== -->
+
+<div align="center">
+  <img src="readme_resource/logo_pic.png" alt="HARP 312 logo" width="420" />
+</div>
+
+<h1 align="center">HARP 312</h1>
+<p align="center">
+  <b>Hybrid Audio Restoration Process</b><br/>
+  A pragmatic post-processing chain for improving <i>technical</i> and <i>perceptual</i> fidelity of <b>MusicGen</b> outputs<br/>
+  (restoration + bandwidth extension + mono-safe stereo synthesis + loudness-compliant mastering)
+</p>
+
+<p align="center">
+  <a href="https://harp312.netlify.app">
+    <img alt="Demo" src="https://img.shields.io/badge/Demo-harp312.netlify.app-2ea44f?style=for-the-badge">
+  </a>
+  <a href="https://github.com/rlpb/HARP-312">
+    <img alt="Repo" src="https://img.shields.io/badge/GitHub-HARP--312-24292e?style=for-the-badge">
+  </a>
+  <a href="https://colab.research.google.com/github/rlpb/HARP-312">
+    <img alt="Colab" src="https://img.shields.io/badge/Colab-ready-f9ab00?style=for-the-badge&logo=googlecolab&logoColor=000">
+  </a>
+</p>
+
+---
+
+## Demo (web app)
+
+<div align="center">
+  <img src="readme_resource/demo_pic.png" alt="HARP 312 web demo screenshot" width="900" />
+</div>
+
+- **Live demo:** https://harp312.netlify.app  
+- The demo is meant for **inspection + qualitative playback**. Production-grade serving requires dedicated compute.
+
+---
+
+## What is HARP 312?
+
+**HARP 312** (where *“312”* denotes the exploratory variant that set the project direction) targets typical fidelity issues in text-to-music generation by chaining:
+
+1) **DSP pre-conditioning** (rumble/DC control + headroom)  
+2) **Conservative restoration** with **Apollo**  
+3) **Bandwidth extension** (audio super-resolution) with **AudioSR**  
+4) **Style estimation** with **Discogs MAEST** (only to bias stereo parameters)  
+5) **Mono-safe stereo synthesis** (controlled Mid/Side)  
+6) **Loudness-normalized mastering** compliant with **BS.1770 / EBU R128**
+
+> Scope: improve *fidelity* and *production readiness* (not prompt adherence).
+
+---
+
+## Pipeline (high level)
+
+**Input:** MusicGen waveform  
+**Output:** mastered stereo (mono-safe), loudness/true-peak compliant
+
+- **Pre-conditioning (DSP):** 2nd-order Butterworth high-pass @ 25 Hz (zero-phase), peak headroom normalization (target -3 dBFS).
+- **Apollo restoration:** chunked inference (e.g., 5 s chunks, 2 s overlap) used strictly as restoration.
+- **AudioSR bandwidth extension:** diffusion SR in chunks (e.g., 6 s with 0.5 s overlap), stitched with crossfades, rendered at 48 kHz.
+- **MAEST style estimation:** predicts a coarse top label mapped to a macro genre bucket; used only to bias stereo injection parameters.
+- **Stereo synthesis:** controlled M/S widening with decorrelated, band-limited side content (bass-safe), transient damping and mono-compatibility guardrails.
+- **Mastering:** two-pass loudness normalization (R128 / BS.1770), true-peak-safe.
+
+---
+
+## Notebooks (run in order)
+
+> The pipeline is split across multiple Colab notebooks to reduce dependency conflicts (CUDA wheels + numpy/scipy/audio stack versioning) under **Colab-free** constraints.
+
+### 1) MusicGen → Apollo (restoration)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rlpb/HARP-312/blob/main/notebooks/1_MusicGen_Apollo_HARP312.ipynb)  
+**Notebook:** `notebooks/1_MusicGen_Apollo_HARP312.ipynb`
+
+### 2) AudioSR (bandwidth extension)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rlpb/HARP-312/blob/main/notebooks/2_AudioSR_HARP312.ipynb)  
+**Notebook:** `notebooks/2_AudioSR_HARP312.ipynb`
+
+### 3) Profiling (MAEST) → Stereoize → Mastering
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rlpb/HARP-312/blob/main/notebooks/3_Profiling_Stereoize_Mastering_HARP312.ipynb)  
+**Notebook:** `notebooks/3_Profiling_Stereoize_Mastering_HARP312.ipynb`
+
+### 4) Analysis & diagnostics (global + per-stage)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rlpb/HARP-312/blob/main/notebooks/4_Analysis_HARP312.ipynb)  
+**Notebook:** `notebooks/4_Analysis_HARP312.ipynb`
+
+---
+
+## Evaluation (what we measure)
+
+- Quick A/B listening (Audio-Technica ATH-M50X)  
+- **Interpretable diagnostics** across checkpoints:
+  - **HF extension** (energy above MusicGen Nyquist)
+  - **M/S width**
+  - **HF contrast** (penalizes quiet-frame HF residue)
+  - **Loudness + true-peak compliance** (BS.1770 / R128)
+
+> Speech-oriented metrics (PESQ/POLQA) and controlled MOS/MUSHRA panels are out of scope given infrastructure limits.
+
+---
+
+## Diagnostics gallery (proof figures)
+
+All figures below are generated by the notebooks and stored in:
+`readme_resource/notebooks_figures/`
+
+### Global summary (end-to-end)
+
+<div align="center">
+  <img src="readme_resource/notebooks_figures/Global - Heatmap.png" alt="Global heatmap" width="900" />
+  <br/><sub><b>Global</b> — normalized indices across checkpoints (MusicGen → Apollo → AudioSR → Master).</sub>
+</div>
+
+<br/>
+
+<div align="center">
+  <img src="readme_resource/notebooks_figures/Global - Average spectrum — Welch PSD.png" alt="Global average spectrum" width="900" />
+  <br/><sub><b>Global</b> — average spectrum (Welch PSD), gain-matched in-band for fair comparison.</sub>
+</div>
+
+<br/>
+
+<div align="center">
+  <img src="readme_resource/notebooks_figures/Global - Radar (main) + Overall (compact).png" alt="Global radar + overall" width="900" />
+  <br/><sub><b>Global</b> — compact radar view + overall index.</sub>
+</div>
+
+---
+
+### Stage-by-stage details (expand)
+
+<details>
+  <summary><b>MusicGen output</b></summary>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/MusicGen output - spectrogram.png" alt="MusicGen spectrogram" width="900" />
+    <br/><sub>Baseline spectrogram of the raw MusicGen output.</sub>
+  </div>
+</details>
+
+<details>
+  <summary><b>Pre-conditioning (DSP)</b></summary>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/PreConditioning - Low-frequency focus.png" alt="Pre-conditioning low frequency focus" width="900" />
+    <br/><sub>Low-frequency focus showing rumble/DC control and stabilization headroom.</sub>
+  </div>
+</details>
+
+<details>
+  <summary><b>Apollo (restoration)</b></summary>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/Apollo - spectrogram.png" alt="Apollo spectrogram" width="900" />
+    <br/><sub>Output spectrogram after conservative restoration.</sub>
+  </div>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/Apollo - Time-frequency difference.png" alt="Apollo time-frequency difference" width="900" />
+    <br/><sub>Time–frequency difference (PRE vs POST) after bounded alignment and in-band gain matching.</sub>
+  </div>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/Apollo - Average spectral residual.png" alt="Apollo average spectral residual" width="900" />
+    <br/><sub>Average spectral residual (structural change emphasis).</sub>
+  </div>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/Apollo - Distribution of spectral differences.png" alt="Apollo distribution of spectral differences" width="900" />
+    <br/><sub>Distribution of spectral differences across frames/bands.</sub>
+  </div>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/Apollo - Macro-band summary.png" alt="Apollo macro-band summary" width="900" />
+    <br/><sub>Macro-band summary of restoration impact.</sub>
+  </div>
+</details>
+
+<details>
+  <summary><b>AudioSR (bandwidth extension)</b></summary>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/AudioSR - spectrogram.png" alt="AudioSR spectrogram" width="900" />
+    <br/><sub>Output spectrogram after diffusion-based audio super-resolution.</sub>
+  </div>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/AudioSR - Average spectrum.png" alt="AudioSR average spectrum" width="900" />
+    <br/><sub>Average spectrum showing high-frequency extension.</sub>
+  </div>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/AudioSR - High-frequency Δ spectrogram.png" alt="AudioSR high-frequency delta spectrogram" width="900" />
+    <br/><sub>High-frequency delta spectrogram (extension region emphasis).</sub>
+  </div>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/AudioSR - In-band Δ spectrogram.png" alt="AudioSR in-band delta spectrogram" width="900" />
+    <br/><sub>In-band delta spectrogram (checks that in-band content stays conservative).</sub>
+  </div>
+</details>
+
+<details>
+  <summary><b>MAEST profiling (style prior)</b></summary>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/AI profiling MAEST - probability.png" alt="MAEST probability" width="900" />
+    <br/><sub>Discogs MAEST top probabilities used only to bias stereo parameters (no creative alteration).</sub>
+  </div>
+</details>
+
+<details>
+  <summary><b>Stereo synthesis + mastering</b></summary>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/Stereo injection profile.png" alt="Stereo injection profile" width="900" />
+    <br/><sub>Stereo injection profile (mono-safe, transient-safe design).</sub>
+  </div>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/Stereo_Master - Stereo field injection — width vs frequency.png" alt="Stereo width vs frequency" width="900" />
+    <br/><sub>Stereo field injection: width vs frequency (bass-safe widening).</sub>
+  </div>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/Stereo_Master - Mastering compliance — loudness & true-peak.png" alt="Mastering compliance loudness and true-peak" width="900" />
+    <br/><sub>Mastering compliance: loudness + true-peak guardrails (BS.1770 / R128).</sub>
+  </div>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/Premaster vs Master - ShortTerm loudness.png" alt="Premaster vs Master short-term loudness" width="900" />
+    <br/><sub>Premaster vs Master: short-term loudness evolution.</sub>
+  </div>
+  <br/>
+  <div align="center">
+    <img src="readme_resource/notebooks_figures/Stereo_Master - Micro-dynamics preservation — crest factor over time.png" alt="Micro-dynamics crest factor over time" width="900" />
+    <br/><sub>Micro-dynamics preservation: crest factor over time (sanity check against over-compression).</sub>
+  </div>
+</details>
+
+---
+
+## References (core components)
+
+- MusicGen — Copet et al. (2023)
+- Apollo — JusperLee (GitHub)
+- AudioSR — Liu et al. (2023)
+- Discogs MAEST — MTG-UPF (Hugging Face)
+- Loudness standards — ITU-R BS.1770 / EBU R128
+
+(Full bibliographic entries are in the report / `references.bib`.)
+
+---
+
+## Notes & caveats
+
+- This project is designed for **inspection and reproducible experimentation** in Colab.
+- Chunking + overlap/crossfade are used to reduce boundary artifacts, but heavy content can still stress Colab VRAM.
+- The stereo stage is **mono-safe by design**, but always check mono compatibility for your specific material.
+
+---
+
+## Links
+
+- **Code + proof samples:** https://github.com/rlpb/HARP-312  
+- **Demo:** https://harp312.netlify.app
