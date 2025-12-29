@@ -6,27 +6,26 @@
 \usepackage{hyperref}
 \usepackage{overpic}
 \usepackage{amssymb}
-
+\usepackage{placeins}
 \usepackage[accepted]{dlai2025}
 
 %%% STUDENTS: FILL IN WITH YOUR OWN INFORMATION
-\dlaititlerunning{DLAI Project Template (replace with your title)}
+\dlaititlerunning{HARP 312 : Hybrid Audio Restoration Process}
 
 \begin{document}
-
 \twocolumn[
 %%% STUDENTS: FILL IN WITH YOUR OWN INFORMATION
-\dlaititle{DLAI Project Template (replace with your title)}
-
+\dlaititle{HARP 312 : Hybrid Audio Restoration Process}
 \begin{center}\today\end{center}
-
 \begin{dlaiauthorlist}
-%%% STUDENTS: FILL IN WITH YOUR OWN INFORMATION
-\dlaiauthor{Emanuele Rodolà}{}
+\dlaiauthor{Federico Carattoli}{}
 \end{dlaiauthorlist}
 
-%%% STUDENTS: FILL IN WITH YOUR OWN INFORMATION
-\dlaicorrespondingauthor{Emanuele Rodolà}{rodola@di.uniroma1.it}
+
+\begingroup
+\spaceskip=0.333em\relax \xspaceskip=\spaceskip
+\dlaicorrespondingauthor{Federico Carattoli}{\nolinkurl{carattoli.1715903@studenti.uniroma1.it}}
+\endgroup
 
 \vskip 0.3in
 ]
@@ -34,85 +33,84 @@
 \printAffiliationsAndNotice{}
 
 \begin{abstract}
-%
-This is a \LaTeX template for writing your project report, to be submitted as part of the final exam. The template can not be modified (you can not change margins, spaces, etc.), and using this template is mandatory. Please read the main text for further details.
-%
+HARP 312 (Hybrid Audio Restoration Process; “312” denotes the exploratory variant that set the project direction) targets fidelity issues in text-to-music generation by chaining pretrained restoration and bandwidth-extension models with lightweight DSP, followed by mono-safe stereo synthesis and loudness-normalized mastering. The pipeline is general for MusicGen outputs; this report documents one reproducible Colab run (additional proof samples are in the repository). Evaluation uses quick A/B listening on Audio-Technica ATH-M50X headphones plus physically interpretable diagnostics (spectral extension, M/S width, HF contrast, and loudness/true-peak compliance). 
+
+\par\noindent Code and proof samples: \url{https://github.com/rlpb/HARP-312}\\
+\noindent Demo: \url{https://harp312.netlify.app}
 \end{abstract}
 
-% ------------------------------------------------------------------------------
-\section{Project submission}
+\section{Introduction}
+Recent text-to-music models can produce convincing musical structure but often exhibit low-level artifacts and limited high-frequency detail relative to production audio \cite{copet2023musicgen}. HARP 312 is a pragmatic, reproducible post-processing chain aimed at improving \emph{technical} and \emph{perceptual} fidelity (not prompt adherence) under constrained infrastructure (Colab-free).
 
-Once you have finished your project, you are required to submit a report using this template. In principle, the only files you need to modify are ``main.tex'' and ``bibliography.tex'' (see Section~\ref{sec:latex} for more details). Hence, you can simply take this document and modify it directly with your own content.
-
-\paragraph*{Limits.}
-The report must have at most 2 pages, without counting the bibliography, which can go to page 3. If you did your project with another student, then your budget is extended to at most 3 pages plus bibliography.
-
-\paragraph*{Code.} 
-Submitting your code is part of the exam. It need not be public (although we encourage it), but at least we must be able to access it for proper evaluation. One possibility is to put your code on a github repository. Please link the code directly from the report, example link: \url{https://github.com/erodola/DLAI-s2-2025}.
+\section{Related work}
+HARP 312 combines pretrained modules for: (i) text-to-music generation (MusicGen) \cite{copet2023musicgen}, (ii) conservative restoration (Apollo) \cite{jusperlee_apollo}, and (iii) diffusion-based audio super-resolution for bandwidth extension (AudioSR) \cite{liu2023audiosr}. For downstream production, loudness and true-peak compliance standards (BS.1770; R128) are followed \cite{itur_bs1770,ebu_r128}. A lightweight AI style estimator (Discogs MAEST) is also used to extract a coarse genre prior, used only to bias stereo-synthesis parameters.
 
 % ------------------------------------------------------------------------------
-\section{Report structure}
+\section{Method}
 
-There is no mandatory structure to adopt, but a typical report should look as follows. 1) An \textbf{introduction} section where the problem is presented, and the overall proposed approach is briefly described; 2) a \textbf{related work} section; 3) a \textbf{method} section, where the main methodology used for the project is described; 4) experimental \textbf{results} (qualitative, quantitative, or both); 5) \textbf{discussion and conclusions}.
+\paragraph{Why multiple Colab notebooks.}
+The pipeline is split across multiple Google Colab notebooks because Colab-free dependency management created repeated version conflicts across the required models and libraries (CUDA wheels, \texttt{numpy}/\texttt{scipy}; and audio stacks). Isolating stages reduced breakages and improved reproducibility under limited hardware constraints.
 
-% ------------------------------------------------------------------------------
-\section{Using \LaTeX}\label{sec:latex}
+\paragraph{Pipeline.}
+Given a MusicGen-generated waveform, HARP 312 applies the following stages (as in the provided notebooks):
 
-If this is your first time using \LaTeX, here are a few common instructions that you may find useful. Please read this while looking at the source code.
+\begin{itemize}\itemsep0pt \parskip0pt \parsep0pt
+\item \textbf{Pre-conditioning (DSP).} A 2nd-order Butterworth high-pass (25\,Hz, zero-phase) reduces DC/sub-rumble, then peak headroom normalization targets $-3$\,dBFS to stabilize subsequent processing.
+\item \textbf{Apollo restoration.} Chunked inference (5\,s chunks, overlap 2) is used strictly as restoration (not a creative effect). Diagnostics use bounded time alignment ($\pm 50$\,ms) and in-band gain matching (below the input Nyquist) to isolate structural changes. Demucs was considered to clean the separated stems, but it introduced audible artifacts that could be amplified by the subsequent AudioSR step and did not improve perceived quality on this material, so it was omitted.\cite{defossez2019demucs}.
+\item \textbf{AudioSR bandwidth extension.} Diffusion-based super-resolution runs in chunks (e.g., 6\,s with 0.5\,s overlap), stitched via crossfades and rendered at 48\,kHz with conservative peak normalization (e.g., $-0.5$\,dBFS) \cite{liu2023audiosr}.
+\item \textbf{Style estimation (MAEST).} On the AudioSR output, a Discogs-style classifier predicts a top label mapped to a macro bucket (e.g., \emph{hiphop}) and used only to bias stereo parameters (bass-safe cutoff and side-level targets) \cite{mtgupf_maest}.
+\item \textbf{Stereo synthesis (mono-safe, transient-safe).} Stereo is synthesized via a controlled mid/side design: side content is decorrelated and band-limited (bass-safe), with transient damping and guardrails for mono compatibility.
+\item \textbf{Mastering (loudness compliance).} Final loudness/true-peak targets are reached with two-pass loudness normalization (R128 / BS.1770 compliant) \cite{itur_bs1770,ebu_r128}.
+\end{itemize}
 
-\paragraph*{Formulas.}
-You can write formulas inline, such as $x^2$, or you can put them in their own environment, for example:
-%
-\begin{equation}\label{eq:dirichlet}
-\lambda_i = \int_\mathcal{X} \langle \nabla \phi_i(x), \nabla \phi_i(x) \rangle dx \,.
-\end{equation}
+\paragraph*{Evaluation protocol.}
+Evaluation combines quick A/B listening on Audio-Technica ATH-M50X headphones with objective diagnostics along the pipeline (HF extension, M/S width, HF contrast, and loudness/true-peak compliance under BS.1770 and R128). PESQ/POLQA and MOS/MUSHRA-style panels are not used \cite{itut_p862_pesq,itut_p863_polqa,itur_bs1534_mushra}; the analysis is anchored to interpretable signal-level indices aligned with the project scope and available infrastructure.
 
-You can also refer to formulas without having to write their equation number by hand, such as Equation~\eqref{eq:dirichlet}.
+\section{Experimental results}
+Multiple MusicGen outputs were generated to stress-test the pipeline under different prompts and conditions; proof samples and intermediate material are available in the project repository:
+\url{https://github.com/rlpb/HARP-312}.The same proof samples are also exposed by the web app for practical, convenient A/B listening comparisons across checkpoints.
+In this report the focus is one representative example and a reproducible signal-level audit to illustrate where each stage contributes.
 
-\paragraph*{Figures.}
-You can and are encouraged to include figures. See an example with Figure~\ref{fig:torus}.
+\paragraph*{Global analysis.}
+Four checkpoints (MusicGen, Apollo, AudioSR, Master) are summarized with normalized diagnostic indices and a spectral view to localize how each stage affects the signal. Overall is computed as the mean of the normalized diagnostic indices used for quality analysis (Hi-Freq Ext, Stereo, and HF Contrast), excluding loudness (LUFS), which is reported separately for compliance. In the analyzed example, Apollo behaves conservatively while improving cleanliness, AudioSR drives the main high-frequency extension, and the final production steps primarily increase spatialization and enforce loudness compliance while preserving the upstream HF character. More detailed per-stage analyses and intermediate outputs are available in the repository notebooks.
 
-\begin{figure}[t]
-    \centering
-    \begin{overpic}[width=0.99\linewidth]{./torus.png}
-    \put(-1, 21){\color{blue}\footnotesize $\mathcal{M}_2$ }
-    \put(13, 12){\color{red}\footnotesize $\mathcal{M}_1$ }
-    \put(93, 30){\footnotesize $\mathcal{Z}$ }
-    \put(79, 26){\scriptsize $z_2$ }
-    \put(88, 26){\scriptsize $z_1$ }
-    \end{overpic}
-    \caption{In the figure caption, you can write what you want including formulas, e.g. $\mathcal{X} \subset \mathbb{R}^3$. Notice that in this figure, we added mathematical symbols on top of the image by using the overpic command.}
-    \label{fig:torus}
+\begin{figure}[!t]
+\centering
+\begin{overpic}[width=0.99\linewidth]{./apollo_figure.png}
+\end{overpic}
+\vspace{-0.15cm}
+\caption{Apollo restoration diagnostics (PRE vs.\ POST). Time--frequency maps are computed after bounded alignment and in-band gain matching (up to the input Nyquist), so differences emphasize structural changes rather than global level offsets. The map remains near 0\,dB in-band, consistent with conservative restoration, with clearer reductions in low-level regions.}
+\label{fig:apollo}
+\vspace{-0.25cm}
 \end{figure}
 
-\paragraph*{Table.}
-Tables can be used to report quantitative results, here is one random example:
+\begin{figure}[!t]
+\centering
+\begin{overpic}[width=0.99\linewidth]{./global_figure_3.png}
+\end{overpic}
+\vspace{-0.15cm}
+\caption{Average spectrum (Welch PSD) across checkpoints, gain-matched in 20\,Hz--16\,kHz for fair in-band comparison. The dashed line marks 16\,kHz (MusicGen Nyquist at 32\,kHz). Differences beyond 16\,kHz reflect bandwidth extension and/or resampling behavior, while in-band offsets capture genuine spectral reshaping.}
+\label{fig:spectrum}
+\vspace{-0.25cm}
+\end{figure}
 
-\begin{table}[h!]
-\caption{Performance comparison.}
-\label{tab:results}
-\begin{center}
-\begin{small}
-\begin{tabular}{p{0.16\linewidth} | ccccc}
-\toprule
-& \multirow{2}{0.1\linewidth}{$\beta$ VAE}& \multirow{2}{0.1\linewidth}{DCI Dis.}& \multirow{2}{0.1\linewidth}{MIG}& \multirow{2}{0.1\linewidth}{MIG-PCA}& \multirow{2}{0.1\linewidth}{MIG-KM}\\
-\#factors \\
-\midrule
-One      & 100\% & \textbf{99.0\%} &  63.7\% & 73.5\% &  69.2\%  \\
-Variable & 98.9\% & 94.9\% & 62.3\% &  70.5\%& \textbf{66.9\%} \\
-\bottomrule
-\end{tabular}
-\end{small}
-\end{center}
-\vspace{-0.5cm}
-\end{table}
+\begin{figure}[!t]
+\centering
+\begin{overpic}[width=0.99\linewidth]{./global_figure_2.png}
+\end{overpic}
+\vspace{-0.15cm}
+\caption{Global analysis heatmap of normalized indices (0--100) for MusicGen, Apollo, AudioSR, and the final Master. Hi-Freq Ext quantifies 16--24\,kHz energy relative to 20\,Hz--16\,kHz, Stereo measures M/S width, and HF Contrast penalizes quiet-frame HF residue. Loudness (LUFS) is reported for compliance but excluded from Overall.}
+\label{fig:heatmap}
+\vspace{-0.35cm}
+\end{figure}
 
-\paragraph*{Bibliography.}
-This is an example bibliographic reference \cite{anderson2008end}. If you want to add more, you must edit the file ``references.bib''.
+\FloatBarrier
 
+\section{Discussion and conclusions}
+HARP 312 combines conservative restoration (Apollo) and bandwidth extension (AudioSR) with style-biased mono-safe stereo synthesis and loudness-normalized mastering; diagnostics indicate that the final Overall gain is driven mainly by controlled stereo widening while preserving the gain-matched in-band reference. The web app is provided as a demo for inspection and qualitative playback; production-grade serving would require dedicated infrastructure.
 
+\clearpage
 \bibliography{references.bib}
 \bibliographystyle{dlai2025}
 
 \end{document}
-
