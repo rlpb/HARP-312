@@ -31,11 +31,6 @@ Repo: https://github.com/rlpb/HARP-312
 
 ---
 
-## Paper / Report
-
-- **PDF:** [`report/main.pdf`](report/main.pdf)
-
----
 
 ## Demo (web app)
 
