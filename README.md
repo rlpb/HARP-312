@@ -74,7 +74,7 @@ Repo: https://github.com/rlpb/HARP-312
 
 ## Notebooks (run in order)
 
-> The pipeline is split across multiple Colab notebooks to reduce dependency conflicts (CUDA wheels + numpy/scipy/audio stack versioning) under **Colab-free** constraints.
+> The pipeline is split across multiple Colab notebooks to reduce dependency conflicts (CUDA wheels + numpy/scipy/audio stack versioning) under **Colab** (free plan) constraints.
 
 ### 1) MusicGen → Apollo (restoration)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rlpb/HARP-312/blob/main/notebooks/1_MusicGen_Apollo_HARP312.ipynb)  
