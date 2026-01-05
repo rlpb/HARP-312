@@ -74,7 +74,7 @@ Repo: https://github.com/rlpb/HARP-312
 
 ## Notebooks (run in order)
 
-> The pipeline is split across multiple Colab notebooks to reduce dependency conflicts (CUDA wheels + numpy/scipy/audio stack versioning) under **Colab** (free plan) constraints.
+> The pipeline is split across multiple Colab notebooks to reduce dependency conflicts (CUDA wheels + numpy/scipy/audio stack versioning) under **Colab**'s (free plan) constraints.
 
 ### 1) MusicGen → Apollo (restoration)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rlpb/HARP-312/blob/main/notebooks/1_MusicGen_Apollo_HARP312.ipynb)  
@@ -103,7 +103,7 @@ Repo: https://github.com/rlpb/HARP-312
   - **HF contrast** (penalizes quiet-frame HF residue)
   - **Loudness + true-peak compliance** (BS.1770 / R128)
 
-> Speech-oriented metrics (PESQ/POLQA) and controlled MOS/MUSHRA panels are out of scope given infrastructure limits.
+> Speech-oriented metrics (PESQ/POLQA) and controlled MOS/MUSHRA panels are not used. The task targets music (not speech), and we rely on interpretable signal-level indices within scope and infrastructure constraints.
 
 ---
 
